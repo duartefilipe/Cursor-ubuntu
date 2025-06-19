@@ -6,7 +6,37 @@ This repository provides a simple script to install or update the Cursor AI IDE 
 
 ## 📝 Version History
 
-### 1.0 (Current)
+
+### 1.1 (Current)
+**Add figlet Library for User-Friendly Terminal Display:**
+
+To enhance the user experience, the script now uses the `figlet` library to display banners and ASCII art in the terminal. This makes the installation and update process more visually friendly and engaging.
+
+- The script will automatically check and install `figlet` if it is not already present on your system.
+- Banners such as "Cursor AI IDE" and a cat ASCII art will be shown at the start of the script for a more welcoming interface.
+
+**Example output:**
+```
+  / ____/_  ________________  _____   /   |  /  _/  /  _/ __ \/ ____/
+ / /   / / / / ___/ ___/ __ \/ ___/  / /| |  / /    / // / / / __/   
+/ /___/ /_/ / /  (__  ) /_/ / /     / ___ |_/ /   _/ // /_/ / /___   
+\____/\__,_/_/  /____/\____/_/     /_/  |_/___/  /___/_____/_____/   
+                                                                     
+For Ubuntu 24.04 LTS
+-------------------------------------------------                                                                     
+  /\_/\
+ ( o.o )
+  > ^ <
+-------------------------------------------------
+1. Install Cursor
+2. Update Cursor
+-------------------------------------------------
+```
+
+This helps users quickly recognize the script's purpose and provides a more pleasant terminal experience.
+
+
+### 1.0 
 - Initial release for Ubuntu 24.04
 - Automatic download of the latest Cursor AppImage from the official website
 - Option to specify a local AppImage file path
