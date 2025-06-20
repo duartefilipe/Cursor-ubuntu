@@ -6,14 +6,13 @@ This repository provides a simple script to install or update the Cursor AI IDE 
 
 ## 📝 Version History
 
-
 ### 1.1 (Current)
-**Add figlet Library for User-Friendly Terminal Display:**
+**Added figlet Library for Enhanced Terminal Display:**
 
-To enhance the user experience, the script now uses the `figlet` library to display banners and ASCII art in the terminal. This makes the installation and update process more visually friendly and engaging.
+To improve user experience, the script now uses the `figlet` library to display banners and ASCII art in the terminal. This makes the installation and update process more visually appealing and engaging.
 
-- The script will automatically check and install `figlet` if it is not already present on your system.
-- Banners such as "Cursor AI IDE" and a cat ASCII art will be shown at the start of the script for a more welcoming interface.
+- The script will automatically check for and install `figlet` if it is not already present on your system.
+- Banners such as "Cursor AI IDE" and a cat ASCII art are shown at the start of the script for a more welcoming interface.
 
 **Example output:**
 ```
@@ -30,11 +29,10 @@ For Ubuntu 24.04 LTS
 -------------------------------------------------
 1. Install Cursor
 2. Update Cursor
+Note: If the menu reappears after choosing 1 or 2, please check the notification above for any issues.
 -------------------------------------------------
 ```
-
 This helps users quickly recognize the script's purpose and provides a more pleasant terminal experience.
-
 
 ### 1.0 
 - Initial release for Ubuntu 24.04
@@ -55,7 +53,7 @@ This helps users quickly recognize the script's purpose and provides a more plea
 ---
 
 ## ✨ Features
-- **Automatic Download:** Fetch and install the latest Cursor AppImage with one click.
+- **Automatic Download:** Fetch and install the latest Cursor AppImage with a single command.
 - **Manual Path Option:** Use a previously downloaded AppImage if you prefer.
 - **Icon Selection:** Choose your preferred icon during setup.
 - **Easy Update:** Update Cursor to the latest version using the same script.
@@ -94,7 +92,7 @@ You will be prompted to choose one of these icons during installation.
 
 3. **Launch Cursor**
     - After installation, find "Cursor AI IDE" in your application menu.
-    - Or launch from terminal:
+    - Or launch from the terminal:
       ```zsh
       /opt/Cursor/AppRun --no-sandbox
       ```
@@ -132,4 +130,4 @@ To uninstall Cursor:
 
 ---
 
-For questions or issues, please open an issue on this repository.
+For questions or issues, please open an issue in this repository.
