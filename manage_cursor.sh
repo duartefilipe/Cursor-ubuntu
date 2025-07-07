@@ -1,9 +1,8 @@
 #!/bin/bash
-#
-# Install / Update script for Cursor AI IDE on Ubuntu 24.04+
-# ───────────────────────────────────────────────────────────
 
-# ── Global Variables ───────────────────────────────────────
+# --- Global Variables ---
+# Change the install directory to a user home directory to avoid sudo in some steps
+# Or keep /opt/Cursor if you want to install system-wide
 CURSOR_EXTRACT_DIR="/opt/Cursor"                   # Where the AppImage is extracted
 ICON_FILENAME_ON_DISK="cursor-icon.png"            # Main icon name
 ALT_ICON_FILENAME_ON_DISK="cursor-black-icon.png"  # Secondary icon (dark variant)
