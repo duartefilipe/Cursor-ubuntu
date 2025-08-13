@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Check Ubuntu version and exit if not 24.04
-UBUNTU_VERSION=$(lsb_release -rs 2>/dev/null)
-if [ "$UBUNTU_VERSION" != "24.04" ]; then
+DISTRIB_RELEASE=$(grep DISTRIB_RELEASE /etc/upstream-release/lsb-release | cut -d= -f2)
+if [ "$DISTRIB_RELEASE" != "24.04" ]; then
     echo "-------------------------------------"
     echo "==============================="
     echo "❌ This script is for Ubuntu 24.04 only."
     echo "==============================="
-    echo "You are running Ubuntu $UBUNTU_VERSION."
+    echo "You are running Ubuntu $DISTRIB_RELEASE."
     echo "This script is for Ubuntu 24.04 only."
     echo "Please use the installer for Ubuntu 22.04:"
     echo "https://github.com/hieutt192/Cursor-ubuntu/tree/main"
@@ -83,20 +83,63 @@ download_latest_cursor_appimage() {
 get_appimage_path() {
     local operation="$1"  # "install" or "update"
     local action_text=""
-
+    
     if [ "$operation" = "update" ]; then
         action_text="new Cursor AppImage"
     else
         action_text="Cursor AppImage"
     fi
-
-    echo "How do you want to provide the $action_text?" >&2
-    echo "📥 1. Automatically download the latest version (recommended)" >&2
-    echo "📁 2. Specify local file path manually" >&2
-    echo "------------------------" >&2
-    read -rp "Choose 1 or 2: " appimage_option >&2
-
+    
+    echo "⬇️ Automatically downloading the latest ${action_text}..." >&2
     local cursor_download_path=""
+    
+    # Try auto-download first
+    cursor_download_path=$(download_latest_cursor_appimage 2>/dev/null | tail -n 1)
+    
+    if [ $? -eq 0 ] && [ -f "$cursor_download_path" ]; then
+        echo "✅ Auto-download successful!" >&2
+    else
+        print_error "Auto-download failed!" >&2
+        echo "" >&2
+        echo "📋 Don't worry! Let's try manual download instead:" >&2
+        echo "1. Visit: https://cursor.sh" >&2
+        echo "2. Download the Cursor AppImage file for Linux" >&2
+        echo "3. Provide the full path to the downloaded .AppImage file below" >&2
+        echo "" >&2
+        echo "⚠️ Important: Please provide a .AppImage file, NOT an icon file (.png)" >&2
+        echo "" >&2
+        
+        # Get manual path with validation loop
+        while true; do
+            if [ "$operation" = "update" ]; then
+                read -rp "📂 Enter the full path to your downloaded Cursor AppImage: " cursor_download_path >&2
+            else
+                read -rp "📂 Enter the full path to your downloaded Cursor AppImage: " cursor_download_path >&2
+            fi
+            
+            # Validate the manual path
+            if [ -f "$cursor_download_path" ] && [[ "$cursor_download_path" =~ \.AppImage$ ]]; then
+                echo "✅ Valid AppImage file found!" >&2
+                break
+            elif [ ! -f "$cursor_download_path" ]; then
+                echo "❌ File not found. Please check the path and try again." >&2
+            elif [[ ! "$cursor_download_path" =~ \.AppImage$ ]]; then
+                echo "❌ Invalid file type. Please provide a .AppImage file, not: $(basename "$cursor_download_path")" >&2
+            else
+                echo "❌ Unknown error. Please try again." >&2
+            fi
+            
+            echo "Do you want to try another path? (y/n)" >&2
+            read -r retry_choice >&2
+            if [[ ! "$retry_choice" =~ ^[Yy]$ ]]; then
+                print_error "Installation cancelled by user." >&2
+                exit 1
+            fi
+        done
+    fi
+    
+    # Return only the path
+    echo "$cursor_download_path"
 
     if [ "$appimage_option" = "1" ]; then
         echo "⏳ Downloading the latest Cursor AppImage, please wait..." >&2
@@ -309,6 +352,84 @@ EOL
     fi
 }
 
+# --- Uninstall Function ---
+uninstallCursor() {
+    figlet -f slant "Uninstall Cursor"
+    echo "🗑️ Uninstalling Cursor AI IDE from Ubuntu..."
+    
+    # Check if Cursor is installed
+    if [ ! -d "$CURSOR_EXTRACT_DIR" ] && [ ! -f "$DESKTOP_ENTRY_PATH" ]; then
+        print_info "Cursor AI IDE does not appear to be installed on this system."
+        echo "No files found at:"
+        echo "  - $CURSOR_EXTRACT_DIR"
+        echo "  - $DESKTOP_ENTRY_PATH"
+        return 0
+    fi
+    
+    # Confirm uninstallation
+    echo "⚠️ This will completely remove Cursor AI IDE from your system."
+    echo "Files to be removed:"
+    
+    if [ -d "$CURSOR_EXTRACT_DIR" ]; then
+        echo "  📁 Installation directory: $CURSOR_EXTRACT_DIR"
+    fi
+    
+    if [ -f "$DESKTOP_ENTRY_PATH" ]; then
+        echo "  🖥️ Desktop entry: $DESKTOP_ENTRY_PATH"
+    fi
+    
+    echo ""
+    echo "⚠️ Note: Your Cursor settings and projects will NOT be affected."
+    echo ""
+    read -rp "Are you sure you want to uninstall Cursor? (y/N): " confirm_uninstall
+    
+    if [[ ! "$confirm_uninstall" =~ ^[Yy]$ ]]; then
+        print_info "Uninstallation cancelled."
+        return 0
+    fi
+    
+    echo "🗑️ Removing Cursor AI IDE..."
+    
+    # Remove installation directory
+    if [ -d "$CURSOR_EXTRACT_DIR" ]; then
+        echo "📁 Removing installation directory..."
+        sudo rm -rf "$CURSOR_EXTRACT_DIR"
+        if [ $? -eq 0 ]; then
+            echo "✅ Installation directory removed successfully."
+        else
+            print_error "Failed to remove installation directory. Please check permissions."
+            return 1
+        fi
+    fi
+    
+    # Remove desktop entry
+    if [ -f "$DESKTOP_ENTRY_PATH" ]; then
+        echo "🖥️ Removing desktop entry..."
+        sudo rm -f "$DESKTOP_ENTRY_PATH"
+        if [ $? -eq 0 ]; then
+            echo "✅ Desktop entry removed successfully."
+        else
+            print_error "Failed to remove desktop entry. Please check permissions."
+            return 1
+        fi
+    fi
+    
+    echo "🗑️ Updating desktop entries..."
+    echo "💡 To refresh your application menu, you may need to:"
+    echo "   • Log out and log back in"
+    echo "   • Restart your computer"
+    echo "   • Or wait a few minutes for automatic refresh"
+    
+    print_success "Cursor AI IDE has been successfully uninstalled from your system."
+    echo ""
+    echo "📝 Important Notes:"
+    echo "   • Your Cursor settings and projects are preserved"
+    echo "   • To reinstall: run this script again and choose option 1"
+    echo "   • If old icons persist after reinstall:"
+    echo "     - Log out and log back in"
+    echo "     - Restart your computer for complete refresh"
+}
+
 # --- Main Menu ---
 install_dependencies
 
@@ -319,13 +440,14 @@ echo "  /\\_/\\"
 echo " ( o.o )"
 echo "  > ^ <"
 echo "------------------------"
-echo "💿 1. Install Cursor"
-echo "🆙 2. Update Cursor"
-echo "🎨 3. Restore Icons"
-echo "Note: If the menu reappears after choosing 1, 2, or 3, check any error message above."
+echo "1. 💿 Install Cursor"
+echo "2. 🆙 Update Cursor"
+echo "3. 🎨 Restore Icons"
+echo "4. 🗑️ Uninstall Cursor"
+echo "Note: If the menu reappears after choosing an option, check any error message above."
 echo "------------------------"
 
-read -rp "Please choose an option (1, 2, or 3): " choice
+read -rp "Please choose an option (1, 2, 3, or 4): " choice
 
 case $choice in
     1)
@@ -337,8 +459,11 @@ case $choice in
     3)
         restoreIcons
         ;;
+    4)
+        uninstallCursor
+        ;;
     *)
-        print_error "Invalid option. Exiting."
+        print_error "Invalid option. Please choose 1, 2, 3, or 4."
         exit 1
         ;;
 esac

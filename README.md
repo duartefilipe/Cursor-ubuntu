@@ -1,129 +1,115 @@
 # Cursor AI IDE Installer for Ubuntu 24.04
 
-A simple and user-friendly script to install, update, and manage the Cursor AI IDE on Ubuntu 24.04. The script supports automatic download of the latest AppImage and provides easy icon customization.
+This is a guideline and script for installing or updating Cursor on Ubuntu 24.04.
+
+## 🚀 Quick Start (One-Line Installation)
+
+Run this command to install/update Cursor directly without cloning the repository:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/hieutt192/Cursor-ubuntu/Cursor-ubuntu24.04/manage_cursor.sh)"
+```
+
+> **Note:** For Ubuntu 22.04 installation, please switch to the `main` branch or visit: [Link](https://github.com/hieutt192/Cursor-ubuntu/tree/main)
+
+---
+
+## 🎨 Script Interface
+
+When you run the script, you'll see a user-friendly menu interface:
+
+```
+   ______                              ___    ____   ________  ______
+  / ____/_  ________________  _____   /   |  /  _/  /  _/ __ \/ ____/
+ / /   / / / / ___/ ___/ __ \/ ___/  / /| |  / /    / // / / / __/   
+/ /___/ /_/ / /  (__  ) /_/ / /     / ___ |_/ /   _/ // /_/ / /___   
+\____/\__,_/_/  /____/\____/_/     /_/  |_/___/  /___/_____/_____/   
+                                                                     
+For Ubuntu 24.04
+-------------------------------------------------
+  /\_/\
+ ( o.o )
+  > ^ <
+------------------------
+1. 💿 Install Cursor
+2. 🆙 Update Cursor
+3. 🎨 Restore Icons
+4. 🗑️ Uninstall Cursor
+Note: If the menu reappears after choosing an option, check any error message above.
+------------------------
+Please choose an option (1, 2, 3, or 4): 
+```
 
 ---
 
 ## ✨ Features
-
-- **🚀 Automatic Installation**: Download and install the latest Cursor AppImage with a single command
-- **🔄 Easy Updates**: Update Cursor to the latest version using the same script
-- **🎨 Icon Customization**: Choose between light and dark theme icons during installation
-- **🔄 Icon Restoration**: Change your icon selection after installation if needed
-- **📦 Dependency Management**: Automatically installs required tools (`curl`, `wget`, `jq`, `figlet`)
-- **🖥️ Desktop Integration**: Creates proper desktop entries for easy launching
-- **🛡️ Safety Checks**: Validates Ubuntu version and provides comprehensive error handling
+- 🚀 **One-line Installation:** Install directly from GitHub without cloning
+- 📦 **Auto-download:** Automatically fetches latest Cursor AppImage 
+- 🔄 **Easy Update:** Update to newest version with single command
+- 🎨 **Icon Restore:** Change your icon selection after installation
+- 🗑️ **Complete Uninstall:** Remove Cursor and all related files
+- 🖥️ **Desktop Integration:** Automatic menu entry creation
 
 ---
+
+## ⚙️ Prerequisites
+- 🐧 Ubuntu 24.04 or compatible Linux distribution
+- 🌐 Internet connection
+- 🔑 `sudo` privileges
+- 📦 `curl` (auto-installed if missing)
+
+---
+
 
 ## 🎨 Available Icons
-
-- <img src="images/cursor-icon.png" alt="Cursor Icon" width="24"/> `cursor-icon.png` – Standard Cursor logo with blue background
-- <img src="images/cursor-black-icon.png" alt="Cursor Black Icon" width="24"/> `cursor-black-icon.png` – Cursor logo with dark/black background
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Ubuntu 24.04 (or compatible)
-- Internet connection
-- `sudo` privileges
-
-### Installation
-
-1. **Download and make executable:**
-   ```bash
-   chmod +x manage_cursor.sh
-   ```
-
-2. **Run the script:**
-   ```bash
-   ./manage_cursor.sh
-   ```
-
-3. **Choose your option:**
-   - `1` - **Install Cursor** (first-time installation)
-   - `2` - **Update Cursor** (update existing installation)
-   - `3` - **Restore Icons** (change icon after installation)
-
-4. **Follow the prompts:**
-   - Choose auto-download (recommended) or specify local file path
-   - Select your preferred icon theme
-   - Wait for installation to complete
-
-5. **Launch Cursor:**
-   - Find "Cursor AI IDE" in your application menu
-   - Or run: `/opt/Cursor/AppRun --no-sandbox`
+- <img src="images/cursor-icon.png" alt="Cursor Icon" width="24"/> `cursor-icon.png` – Standard Cursor logo with blue background  
+- <img src="images/cursor-black-icon.png" alt="Cursor Black Icon" width="24"/> `cursor-black-icon.png` – Cursor logo with dark background
 
 ---
 
-## 🛠️ What the Script Does
-
-The script handles the complete installation process:
-
-1. **System Validation**: Checks Ubuntu version compatibility
-2. **Dependency Installation**: Installs required tools automatically
-3. **AppImage Processing**: Downloads and extracts the Cursor AppImage
-4. **System Integration**: Creates desktop entries and sets proper permissions
-5. **Icon Management**: Downloads and applies your chosen icon theme
+## ⚠️ Important Notes
+- **Ubuntu 24.04:** This script is specifically designed for Ubuntu 24.04
+- **Do NOT install libfuse2:** Unlike Ubuntu 22.04, libfuse2 is not needed and can cause issues
+- **Restart recommended:** For best experience, restart after installation
+- **Sudo required:** Script needs admin privileges for system-wide installation
 
 ---
 
-## 🎨 Icon Management
-
-### During Installation
-You'll be prompted to choose an icon filename:
-- `cursor-icon.png` for light theme
-- `cursor-black-icon.png` for dark theme
-
-### After Installation
-Use option `3` (Restore Icons) to change your icon selection:
-1. Run the script: `./manage_cursor.sh`
-2. Choose option `3`
-3. Enter the desired icon filename
-4. The script will download and apply the new icon automatically
+## 🧩 Troubleshooting
+If you encounter any issues:
+1. **Permission errors:** Ensure you have `sudo` privileges and active internet connection
+2. **Script fails to download:** Check your network connection and try again
+3. **Cursor won't start:** Run from terminal to see error messages: `/opt/Cursor/AppRun --no-sandbox`
+4. **Desktop entry missing:** Log out and log back in, or restart your computer
 
 ---
 
 ## ❌ Uninstallation
 
-To completely remove Cursor:
+The script includes a built-in uninstall option. Simply run the script and choose option 4:
 
 ```bash
-# Remove application files
-sudo rm -rf /opt/Cursor
-
-# Remove desktop entry
-sudo rm -f /usr/share/applications/cursor.desktop
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/hieutt192/Cursor-ubuntu/Cursor-ubuntu24.04/manage_cursor.sh)"
 ```
 
----
-
-## 🧩 Troubleshooting
-
-**Common Issues:**
-- **Wrong Ubuntu version**: Script is designed for Ubuntu 24.04 only
-- **Permission denied**: Ensure you have `sudo` privileges
-- **Download fails**: Check your internet connection
-- **Icon not showing**: Try the "Restore Icons" option
-- **App won't start**: Run from terminal to see error messages
-
-**Script Permissions:**
+Or if you have the script locally:
 ```bash
-chmod +x manage_cursor.sh
+./manage_cursor.sh
 ```
 
----
-
-## 📝 Notes
-
-- The script automatically handles all dependencies
-- Icons are downloaded from this repository's `images` directory
-- Desktop entries are created with proper permissions
-- The `--no-sandbox` flag is used for compatibility
-- All temporary files are cleaned up automatically
+Select **4. 🗑️ Uninstall Cursor** from the menu for complete removal.
 
 ---
 
-For questions or issues, please open an issue in this repository.
+## 🆕 New Feature Release
+
+### Latest Features (Current Version)
+**Enhanced Script Interface and User Experience:**
+- **🚀 One-line Installation:** Direct installation via curl command without cloning repository
+- **🗑️ Uninstall Option:** Complete removal functionality built into main menu
+- **🎨 Icon Restore:** Change your icon selection after installation with dedicated option
+- **📦 Smart Auto-download:** Intelligent download with automatic fallback to manual input
+- **🖥️ Desktop Integration:** Automatic menu entry creation and proper permissions
+- **💻 Ubuntu 24.04 Optimized:** Specifically designed for Ubuntu 24.04 without libfuse2 dependency
+- **🎭 Beautiful UI:** ASCII art banner with figlet and friendly cat mascot
+- **🔧 Comprehensive Management:** Install, Update, Restore Icons, and Uninstall all in one script
