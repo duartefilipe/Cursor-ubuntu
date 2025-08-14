@@ -1,7 +1,28 @@
 #!/bin/bash
 
+# --- Utility Functions ---
+print_error() {
+    echo "==============================="
+    echo "❌ $1"
+    echo "==============================="
+}
+
 # Check Ubuntu version and exit if not 24.04
-DISTRIB_RELEASE=$(grep DISTRIB_RELEASE /etc/upstream-release/lsb-release | cut -d= -f2)
+# Try different locations for lsb-release file
+if [ -f "/etc/upstream-release/lsb-release" ]; then
+    DISTRIB_RELEASE=$(grep DISTRIB_RELEASE /etc/upstream-release/lsb-release | cut -d= -f2)
+elif [ -f "/etc/lsb-release" ]; then
+    DISTRIB_RELEASE=$(grep DISTRIB_RELEASE /etc/lsb-release | cut -d= -f2)
+else
+    # Fallback to lsb_release command if available
+    if command -v lsb_release &> /dev/null; then
+        DISTRIB_RELEASE=$(lsb_release -r | cut -f2)
+    else
+        print_error "Cannot determine Ubuntu version. Please ensure this is Ubuntu 24.04."
+        exit 1
+    fi
+fi
+
 if [ "$DISTRIB_RELEASE" != "24.04" ]; then
     echo "-------------------------------------"
     echo "==============================="
@@ -24,12 +45,6 @@ EXECUTABLE_PATH="${CURSOR_EXTRACT_DIR}/AppRun"     # Main executable after extra
 DESKTOP_ENTRY_PATH="/usr/share/applications/cursor.desktop"
 
 # --- Utility Functions ---
-print_error() {
-    echo "==============================="
-    echo "❌ $1"
-    echo "==============================="
-}
-
 print_success() {
     echo "==============================="
     echo "✅ $1"
@@ -98,6 +113,9 @@ get_appimage_path() {
     
     if [ $? -eq 0 ] && [ -f "$cursor_download_path" ]; then
         echo "✅ Auto-download successful!" >&2
+        # Return the auto-downloaded path
+        echo "$cursor_download_path"
+        return 0
     else
         print_error "Auto-download failed!" >&2
         echo "" >&2
@@ -136,39 +154,11 @@ get_appimage_path() {
                 exit 1
             fi
         done
+        
+        # Return the manually entered path
+        echo "$cursor_download_path"
+        return 0
     fi
-    
-    # Return only the path
-    echo "$cursor_download_path"
-
-    if [ "$appimage_option" = "1" ]; then
-        echo "⏳ Downloading the latest Cursor AppImage, please wait..." >&2
-        cursor_download_path=$(download_latest_cursor_appimage 2>/dev/null | tail -n 1)
-        if [ $? -ne 0 ] || [ ! -f "$cursor_download_path" ]; then
-            print_error "Auto-download failed!" >&2
-            echo "🤔 Would you like to specify the local file path manually instead? (y/n)" >&2
-            read -r retry_option >&2
-            if [[ "$retry_option" =~ ^[Yy]$ ]]; then
-                if [ "$operation" = "update" ]; then
-                    read -rp "📂 Enter new Cursor AppImage file path: " cursor_download_path >&2
-                else
-                    read -rp "📂 Enter Cursor AppImage file path: " cursor_download_path >&2
-                fi
-            else
-                echo "❌ Exiting." >&2
-                exit 1
-            fi
-        fi
-    else
-        if [ "$operation" = "update" ]; then
-            read -rp "📂 Enter new Cursor AppImage file path: " cursor_download_path >&2
-        else
-            read -rp "📂 Enter Cursor AppImage file path: " cursor_download_path >&2
-        fi
-    fi
-
-    # Return only the path
-    echo "$cursor_download_path"
 }
 
 # --- AppImage Processing ---
@@ -252,10 +242,41 @@ installCursor() {
     process_appimage "$cursor_download_path" "install"
 
     # ── Icon & desktop entry ───────────────────────────────────────────────
-    read -rp "🎨 Enter icon filename from GitHub (e.g., cursor-icon.png): " icon_name_from_github
-    local icon_download_url="https://raw.githubusercontent.com/hieutt192/Cursor-ubuntu/main/images/$icon_name_from_github"
-    echo "🎨 Downloading icon to $ICON_PATH..."
-    sudo curl -L "$icon_download_url" -o "$ICON_PATH"
+    echo "Available icons:"
+    echo "1. cursor-icon.png - Standard Cursor logo with blue background"
+    echo "2. cursor-black-icon.png - Cursor logo with dark/black background"
+    echo "Note: Only these 2 icons are currently available."
+    echo "------------------------"
+    while true; do
+        read -rp "🎨 Enter icon filename (cursor-icon.png or cursor-black-icon.png): " icon_name_from_github
+        
+        # Validate icon filename
+        if [ -z "$icon_name_from_github" ]; then
+            echo "❌ No icon filename provided. Please try again."
+            continue
+        elif [[ ! "$icon_name_from_github" =~ \.(png|jpg|jpeg|svg)$ ]]; then
+            echo "❌ Invalid file type. Please provide an image file (.png, .jpg, .jpeg, .svg)."
+            continue
+        fi
+        
+        local icon_download_url="https://raw.githubusercontent.com/hieutt192/Cursor-ubuntu/Cursor-ubuntu24.04/images/$icon_name_from_github"
+        echo "🎨 Downloading icon to $ICON_PATH..."
+        
+        # Try to download icon with error handling
+        if sudo curl -L "$icon_download_url" -o "$ICON_PATH" -f; then
+            echo "✅ Icon downloaded successfully!"
+            break
+        else
+            echo "❌ Failed to download icon from: $icon_download_url"
+            echo "Available icons: cursor-icon.png, cursor-black-icon.png"
+            echo "Do you want to try another filename? (y/n)"
+            read -r retry_icon
+            if [[ ! "$retry_icon" =~ ^[Yy]$ ]]; then
+                print_error "Installation cancelled due to icon download failure."
+                exit 1
+            fi
+        fi
+    done
 
     echo "🖥️ Creating .desktop entry for Cursor..."
     sudo tee "$DESKTOP_ENTRY_PATH" >/dev/null <<EOL
@@ -312,18 +333,18 @@ restoreIcons() {
     echo "1. cursor-icon.png - Standard Cursor logo with blue background"
     echo "2. cursor-black-icon.png - Cursor logo with dark/black background"
     echo "------------------------"
-    read -rp "Enter icon filename (e.g., cursor-icon.png): " icon_name_from_github
+    read -rp "Enter icon filename (e.g., cursor-icon.png, cursor-black-icon.png): " icon_name_from_github
 
     if [ -z "$icon_name_from_github" ]; then
         print_error "No icon filename provided. Exiting."
         exit 1
     fi
 
-    local icon_download_url="https://raw.githubusercontent.com/hieutt192/Cursor-ubuntu/main/images/$icon_name_from_github"
+    local icon_download_url="https://raw.githubusercontent.com/hieutt192/Cursor-ubuntu/Cursor-ubuntu24.04/images/$icon_name_from_github"
     echo "🎨 Downloading icon to $ICON_PATH..."
 
     # Download the new icon
-    if sudo curl -L "$icon_download_url" -o "$ICON_PATH"; then
+    if sudo curl -L "$icon_download_url" -o "$ICON_PATH" -f; then
         echo "✅ Icon downloaded successfully!"
 
         # Update the desktop entry with the new icon
@@ -443,7 +464,7 @@ echo "------------------------"
 echo "1. 💿 Install Cursor"
 echo "2. 🆙 Update Cursor"
 echo "3. 🎨 Restore Icons"
-echo "4. 🗑️ Uninstall Cursor"
+echo "4. 🗑️  Uninstall Cursor"
 echo "Note: If the menu reappears after choosing an option, check any error message above."
 echo "------------------------"
 
