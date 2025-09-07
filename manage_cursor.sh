@@ -1,19 +1,20 @@
 #!/bin/bash
 
 # Check Ubuntu version and exit if 24.04
-UBUNTU_VERSION=$(lsb_release -rs 2>/dev/null)
-if [ "$UBUNTU_VERSION" = "24.04" ]; then
-    echo "-------------------------------------"
-    echo "==============================="
-    echo "❌ This script is for Ubuntu 22.04 only."
-    echo "==============================="    
-    echo "You are running Ubuntu 24.04."
-    echo "This script is for Ubuntu 22.04 only."
-    echo "Please use the installer for Ubuntu 24.04:"
-    echo "https://github.com/hieutt192/Cursor-ubuntu/tree/Cursor-ubuntu24.04"
-    echo "-------------------------------------"
-    exit 1
-fi
+# UBUNTU_VERSION=$(lsb_release -rs 2>/dev/null)
+# if [ "$UBUNTU_VERSION" = "24.04" ]; then
+#     echo "-------------------------------------"
+#     echo "==============================="
+#     echo "❌ This script is for Ubuntu 22.04 only."
+#     echo "==============================="    
+#     echo "You are running Ubuntu 24.04."
+#     echo "This script is for Ubuntu 22.04 only."
+#     echo "Please use the installer for Ubuntu 24.04:"
+#     echo "https://github.com/hieutt192/Cursor-ubuntu/tree/Cursor-ubuntu24.04"
+#     echo "-------------------------------------"
+#     exit 1
+# fi
+
 
 # --- Global Variables ---
 # Change the install directory to a user home directory to avoid sudo in some steps
