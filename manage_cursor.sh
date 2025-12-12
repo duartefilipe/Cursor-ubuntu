@@ -25,15 +25,15 @@ print_error() {
 }
 
 print_success() {
-    echo -e "\033[0;32m✅ [SUCCESS] $1\033[0m"
+    echo -e "\033[0;32m✅ [SUCCESS] $1\033[0m" >&2
 }
 
 print_info() {
-    echo -e "\033[0;34mℹ️  [INFO] $1\033[0m"
+    echo -e "\033[0;34mℹ️  [INFO] $1\033[0m" >&2
 }
 
 print_warn() {
-    echo -e "\033[0;33m⚠️  [WARNING] $1\033[0m"
+    echo -e "\033[0;33m⚠️  [WARNING] $1\033[0m" >&2
 }
 
 # Cleanup temporary files on exit
